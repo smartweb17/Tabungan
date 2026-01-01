@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Cash Dashboard Control</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#0b1220;
+  --card:#121a2f;
+  --accent:#38bdf8;
+  --accent2:#22c55e;
+  --danger:#ef4444;
+  --text:#e5e7eb;
+}
+*{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{
+  margin:0;
+  background:linear-gradient(135deg,#020617,#0b1220);
+  color:var(--text);
+}
+.hidden{display:none}
+.container{max-width:1200px;margin:auto;padding:24px;animation:fade .6s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{
+  background:linear-gradient(180deg,var(--card),#0b1220);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:22px;
+  box-shadow:0 20px 50px rgba(0,0,0,.45);
+  transition:.3s
+}
+.card:hover{transform:translateY(-4px)}
+h1,h2,h3{margin-top:0}
+input,select,button{
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  width:100%;
+  margin-top:10px;
+  background:#020617;
+  color:var(--text)
+}
+button{
+  background:linear-gradient(135deg,var(--accent),#0ea5e9);
+  color:#022c22;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.3s
+}
+button:hover{opacity:.85;transform:scale(1.02)}
+button.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:white}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+nav{
+  display:flex;
+  gap:12px;
+  margin-bottom:22px;
+  flex-wrap:wrap
+}
+nav button{
+  width:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#020617;
+  color:var(--text)
+}
+nav button.active{background:var(--accent);color:#022c22}
+.stat{font-size:28px;font-weight:700}
+.small{font-size:13px;opacity:.75}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;border-bottom:1px solid #1f2937;text-align:left}
+progress{width:100%;height:22px;border-radius:20px;overflow:hidden}
+progress::-webkit-progress-bar{background:#020617}
+progress::-webkit-progress-value{background:linear-gradient(90deg,var(--accent2),#4ade80)}
+.logout{background:#020617;color:white}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.logo i{font-size:28px;color:var(--accent)}
+</style>
+</head>
+<body><!-- LOGIN --><div class="container" id="loginPage">
+  <div class="card" style="max-width:420px;margin:auto">
+    <div class="logo"><i class="fa-solid fa-piggy-bank"></i><h2>Smart Saving</h2></div>
+    <p class="small">Kelola tabunganmu dengan cerdas</p>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+    <p class="small">Default: admin / admin123</p>
+  </div>
+</div><!-- DASHBOARD --><div class="container hidden" id="app"><div class="logo"><i class="fa-solid fa-chart-line"></i><h2>Dashboard Tabungan</h2></div><nav>
+  <button onclick="show('dashboard',this)" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</button>
+  <button onclick="show('transaksi',this)"><i class="fa-solid fa-money-bill-transfer"></i> Transaksi</button>
+  <button onclick="show('target',this)"><i class="fa-solid fa-bullseye"></i> Target</button>
+  <button onclick="show('analisis',this)"><i class="fa-solid fa-chart-pie"></i> Analisis</button>
+  <button class="logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+</nav><div id="dashboard" class="page">
+  <div class="row">
+    <div class="card"><div class="small">Saldo</div><div class="stat" id="saldo">0</div></div>
+    <div class="card"><div class="small">Pemasukan</div><div class="stat" id="masuk">0</div></div>
+    <div class="card"><div class="small">Pengeluaran</div><div class="stat" id="keluar">0</div></div>
+  </div>
+</div><div id="transaksi" class="page hidden">
+  <div class="card">
+    <h2><i class="fa-solid fa-plus"></i> Tambah Transaksi</h2>
+    <select id="jenis"><option value="masuk">Pemasukan</option><option value="keluar">Pengeluaran</option></select>
+    <input id="jumlah" type="number" placeholder="Jumlah">
+    <input id="ket" placeholder="Keterangan">
+    <button onclick="tambahTransaksi()">Simpan</button>
+  </div>
+  <div class="card">
+    <h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat</h2>
+    <table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Ket</th></tr></thead><tbody id="list"></tbody></table>
+  </div>
+</div><div id="target" class="page hidden">
+  <div class="card">
+    <h2><i class="fa-solid fa-bullseye"></i> Target Tabungan</h2>
+    <input id="targetNama" placeholder="Nama Target">
+    <input id="targetJumlah" type="number" placeholder="Jumlah Target">
+    <button onclick="setTarget()">Simpan Target</button>
+  </div>
+  <div class="card">
+    <h3 id="targetInfo">Belum ada target</h3>
+    <progress id="progress" value="0" max="100"></progress>
+  </div>
+</div><div id="analisis" class="page hidden">
+  <div class="card">
+    <h2><i class="fa-solid fa-chart-pie"></i> Analisis Keuangan</h2>
+    <canvas id="chart" height="120"></canvas>
+    <p id="analisisText"></p>
+  </div>
+</div></div><script>
+let data = JSON.parse(localStorage.getItem('tabungan')) || {user:{username:'admin',password:'admin123'},transaksi:[],target:null};
+function save(){localStorage.setItem('tabungan',JSON.stringify(data));}
+function login(){if(user.value===data.user.username && pass.value===data.user.password){loginPage.classList.add('hidden');app.classList.remove('hidden');render();}else alert('Login salah');}
+function logout(){location.reload()}
+function show(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function tambahTransaksi(){if(!jumlah.value)return;data.transaksi.push({tgl:new Date().toLocaleDateString(),jenis:jenis.value,jumlah:+jumlah.value,ket:ket.value});save();jumlah.value='';ket.value='';render();}
+function setTarget(){data.target={nama:targetNama.value,jumlah:+targetJumlah.value};save();render();}
+function render(){let masuk=0,keluar=0;list.innerHTML='';data.transaksi.forEach(t=>{t.jenis==='masuk'?masuk+=t.jumlah:keluar+=t.jumlah;list.innerHTML+=`<tr><td>${t.tgl}</td><td>${t.jenis}</td><td>${t.jumlah}</td><td>${t.ket}</td></tr>`});saldo.innerText=(masuk-keluar).toLocaleString();this.masuk.innerText=masuk.toLocaleString();this.keluar.innerText=keluar.toLocaleString();if(data.target){targetInfo.innerText=`${data.target.nama} : ${data.target.jumlah.toLocaleString()}`;progress.value=Math.min(100,((masuk-keluar)/data.target.jumlah)*100)}analisisText.innerText=`Kamu berhasil menabung ${(masuk?((masuk-keluar)/masuk*100).toFixed(1):0)}% dari total pemasukan.`}
+</script></body>
+</html>
