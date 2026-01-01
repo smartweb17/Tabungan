@@ -2,38 +2,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Cash Dashboard Control</title>
+<title>Smart Saving Pro</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">function hapusTrx(i){
+  if(!confirm('Hapus transaksi ini?')) return;
+  data.transaksi.splice(i,1);
+  save();
+  render();
+}function editTrx(i){ const t=data.transaksi[i]; jenis.value=t.jenis; kategori.value=t.kategori; jumlah.value=t.jumlah; ket.value=t.ket||''; data.transaksi.splice(i,1); save(); } </script>
+
 <style>
 :root{--bg:#0b1220;--card:#121a2f;--accent:#38bdf8;--accent2:#22c55e;--danger:#ef4444;--text:#e5e7eb}
 *{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
 body{margin:0;background:linear-gradient(135deg,#020617,#0b1220);color:var(--text)}
 .hidden{display:none}
-.container{max-width:1300px;margin:auto;padding:24px;animation:fade .5s ease}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+.container{max-width:1300px;margin:auto;padding:24px}
 .card{background:linear-gradient(180deg,var(--card),#0b1220);border-radius:18px;padding:22px;margin-bottom:22px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
-input,select,button{padding:12px;border-radius:12px;border:none;width:100%;margin-top:10px;background:#020617;color:var(--text)}
+input,select,button{padding:12px;border-radius:10px;border:none;width:100%;margin-top:10px;background:#020617;color:var(--text)}
 button{background:linear-gradient(135deg,var(--accent),#0ea5e9);font-weight:bold;cursor:pointer}
-button:hover{opacity:.9}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
 nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
 nav button{width:auto;display:flex;gap:8px;align-items:center;background:#020617}
 nav button.active{background:var(--accent);color:#022c22}
 .stat{font-size:28px;font-weight:700}
-.small{font-size:13px;opacity:.75}
-progress{width:100%;height:22px}
 table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #1f2937}
-</style>
-</head>
+th,td{padding:10px;border-bottom:1px solid #1f2937;white-space:nowrap}
+.aksi{display:flex;gap:6px}
+.aksi button{padding:6px 10px;font-size:12px;width:auto}
+.btn-edit{background:#22c55e;color:#022c22}
+.btn-hapus{background:#ef4444;color:#fff}
+</style></head>
 <body><div class="container" id="loginPage">
   <div class="card" style="max-width:420px;margin:auto">
     <h2><i class="fa-solid fa-piggy-bank"></i> Smart Saving Pro</h2>
     <input id="user" placeholder="Username">
     <input id="pass" type="password" placeholder="Password">
     <button onclick="login()">Login</button>
-    <p class="small">admin / admin123</p>
   </div>
 </div><div class="container hidden" id="app">
 <nav>
@@ -52,7 +56,7 @@ th,td{padding:10px;border-bottom:1px solid #1f2937}
   <div class="card">
     <h3>Tambah Transaksi</h3>
     <select id="jenis"><option value="masuk">Pemasukan</option><option value="keluar">Pengeluaran</option></select>
-    <select id="kategori"><option>Makan</option><option>Transport</option><option>Hiburan</option><option>Lainnya</option></select>
+    <select id="kategori"><option>Cash</option><option>Saldo</option></select>
     <input id="jumlah" type="number" placeholder="Jumlah">
     <input id="ket" placeholder="Keterangan">
     <button onclick="tambahTransaksi()">Simpan</button>
@@ -81,5 +85,21 @@ function setTarget(){data.target={nama:targetNama.value,jumlah:+targetJumlah.val
 function exportData(){const a=document.createElement('a');a.href='data:text/json,'+encodeURIComponent(JSON.stringify(data));a.download='tabungan.json';a.click()}
 let chart;
 function render(){let m=0,k=0;list.innerHTML='';data.transaksi.forEach((t,i)=>{t.jenis==='masuk'?m+=t.jumlah:k+=t.jumlah;list.innerHTML+=`<tr><td>${t.tgl}</td><td>${t.jenis==='masuk'?'💰 Pemasukan':'💸 Pengeluaran'}</td><td>${t.kategori}</td><td>${t.jumlah}</td><td><button onclick="editTrx(${i})">Edit</button> <button onclick="hapusTrx(${i})">Hapus</button></td></tr>`});saldo.innerText=(m-k).toLocaleString();masuk.innerText=m.toLocaleString();keluar.innerText=k.toLocaleString();if(data.target){targetInfo.innerText=data.target.nama;progress.value=Math.min(100,(m-k)/data.target.jumlah*100)}if(chart)chart.destroy();chart=new Chart(document.getElementById('chart'),{type:'pie',data:{labels:['Masuk','Keluar'],datasets:[{data:[m,k]}]}});analisisText.innerText=`Kamu menabung ${(m?((m-k)/m*100).toFixed(1):0)}% dari pemasukan`}
+function hapusTrx(i){
+  if(!confirm('Hapus transaksi ini?')) return;
+  data.transaksi.splice(i,1);
+  save();
+  render();
+}
+
+function editTrx(i){
+  const t=data.transaksi[i];
+  jenis.value=t.jenis;
+  kategori.value=t.kategori;
+  jumlah.value=t.jumlah;
+  ket.value=t.ket||'';
+  data.transaksi.splice(i,1);
+  save();
+}
 </script></body>
 </html>
