@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Cash - Cloud</title>
+<title>Smart Cash Dashboard Control</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -61,7 +61,7 @@ progress{width:100%;height:20px;accent-color:var(--accent)}
       <h3 id="formTitle">Tambah Transaksi</h3>
       <div class="row" style="grid-template-columns: 1fr 1fr;">
         <select id="jenis"><option value="masuk">Pemasukan</option><option value="keluar">Pengeluaran</option></select>
-        <select id="kategori"><option>Cash</option><option>Bank</option></select>
+        <select id="kategori"><option>Cash</option><option>Saldo</option></select>
       </div>
       <input id="jumlah" type="text" placeholder="Jumlah (Rp)" oninput="formatInput(this)">
       <input id="ket" placeholder="Keterangan">
@@ -195,7 +195,7 @@ function render() {
     t.jenis === 'masuk' ? m += t.jumlah : k += t.jumlah;
     list.innerHTML += `<tr>
       <td>${t.tgl}</td>
-      <td>${t.jenis=='masuk'?'<span style="color:var(--success)">+</span>':'<span style="color:var(--danger)">-</span>'}</td>
+      <td>${t.jenis=='masuk'?'<span style="color:var(--success)">💰 Masuk</span>':'<span style="color:var(--danger)">💸 Keluar</span>'}</td>
       <td>${t.ket}</td>
       <td>${formatRupiah(t.jumlah)}</td>
       <td><div class="aksi">
