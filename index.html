@@ -3,332 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Cash Dashboard Control</title>
-
+<title>Smart Cash - Cloud</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-:root{
-  --bg:#0b1220;
-  --card:#121a2f;
-  --accent:#38bdf8;
-  --success:#22c55e;
-  --danger:#ef4444;
-  --text:#e5e7eb;
-}
-
+:root{--bg:#0b1220;--card:#121a2f;--accent:#38bdf8;--success:#22c55e;--danger:#ef4444;--text:#e5e7eb}
 *{box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-body{margin:0;background:linear-gradient(135deg,#020617,#0b1220);color:var(--text)}
+body{margin:0;background:linear-gradient(135deg,#020617,#0b1220);color:var(--text);min-height:100vh}
 .hidden{display:none}
-
 .container{max-width:1300px;margin:auto;padding:20px}
-.card{
-  background:linear-gradient(180deg,var(--card),#0b1220);
-  border-radius:18px;
-  padding:22px;
-  margin-bottom:22px;
-  box-shadow:0 20px 50px rgba(0,0,0,.45)
-}
-
-input,select,button{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  margin-top:10px;
-  background:#020617;
-  color:var(--text)
-}
-
-button{
-  background:linear-gradient(135deg,var(--accent),#0ea5e9);
-  font-weight:bold;
-  cursor:pointer
-}
-
-nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:20px
-}
-nav button{
-  width:auto;
-  display:flex;
-  gap:8px;
-  align-items:center;
-  background:#020617
-}
-nav button.active{
-  background:var(--accent);
-  color:#022c22
-}
-
-.row{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:18px
-}
-
+.card{background:linear-gradient(180deg,var(--card),#0b1220);border-radius:18px;padding:22px;margin-bottom:22px;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+input,select,button{width:100%;padding:12px;border-radius:10px;border:none;margin-top:10px;background:#020617;color:var(--text)}
+button{background:linear-gradient(135deg,var(--accent),#0ea5e9);font-weight:bold;cursor:pointer;transition:0.3s}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+nav button{width:auto;display:flex;gap:8px;align-items:center;background:#1e293b}
+nav button.active{background:var(--accent);color:#022c22}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
 .stat{font-size:28px;font-weight:700}
-
-/* TABLE */
-table{
-  width:100%;
-  border-collapse:collapse;
-  table-layout:fixed
-}
-th,td{
-  padding:10px;
-  border-bottom:1px solid #1f2937;
-  word-wrap:break-word
-}
-
-@media(max-width:768px){
-  table{display:block;overflow-x:auto;white-space:nowrap}
-  td:last-child{min-width:140px}
-}
-
-/* AKSI */
-.aksi{display:flex;gap:6px}
-.aksi button{
-  width:auto;
-  padding:6px 10px;
-  font-size:12px
-}
-.btn-edit{background:var(--success);color:#022c22}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;border-bottom:1px solid #1f2937;text-align:left}
+.aksi{display:flex;gap:5px}
+.aksi button{width:auto;padding:5px 10px;font-size:11px}
+.btn-edit{background:var(--success);color:#062006}
 .btn-hapus{background:var(--danger);color:#fff}
+progress{width:100%;height:20px;accent-color:var(--accent)}
 </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
 <div class="container" id="loginPage">
-  <div class="card" style="max-width:420px;margin:auto">
+  <div class="card" style="max-width:400px;margin:100px auto">
     <h2><i class="fa fa-piggy-bank"></i> Smart Cash</h2>
     <input id="user" placeholder="Username">
     <input id="pass" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <small>admin / admin123</small>
+    <button onclick="login()">Masuk</button>
   </div>
 </div>
 
-<!-- APP -->
 <div class="container hidden" id="app">
+  <nav>
+    <button class="active" onclick="show('dashboard',this)"><i class="fa fa-gauge"></i> Dashboard</button>
+    <button onclick="show('transaksi',this)"><i class="fa fa-money-bill"></i> Transaksi</button>
+    <button onclick="show('target',this)"><i class="fa fa-bullseye"></i> Target</button>
+  </nav>
 
-<nav>
-  <button class="active" onclick="show('dashboard',this)">
-    <i class="fa fa-gauge"></i> Dashboard
-  </button>
-  <button onclick="show('transaksi',this)">
-    <i class="fa fa-money-bill"></i> Transaksi
-  </button>
-  <button onclick="show('target',this)">
-    <i class="fa fa-bullseye"></i> Target
-  </button>
-  <button onclick="show('analisis',this)">
-    <i class="fa fa-chart-line"></i> Analisis
-  </button>
-</nav>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="page">
-  <div class="row">
-    <div class="card">Saldo<div class="stat" id="saldo">0</div></div>
-    <div class="card">Pemasukan<div class="stat" id="masuk">0</div></div>
-    <div class="card">Pengeluaran<div class="stat" id="keluar">0</div></div>
-  </div>
-</div>
-
-<!-- TRANSAKSI -->
-<div id="transaksi" class="page hidden">
-  <div class="card">
-    <h3>Tambah / Edit Transaksi</h3>
-    <select id="jenis">
-      <option value="masuk">Pemasukan</option>
-      <option value="keluar">Pengeluaran</option>
-    </select>
-    <select id="kategori">
-      <option>Cash</option>
-      <option>Saldo</option>
-    </select>
-
-    <!-- INPUT AUTO FORMAT -->
-    <input id="jumlah" type="text" placeholder="Jumlah"
-           oninput="formatInput(this)">
-    <input id="ket" placeholder="Keterangan">
-
-    <button onclick="tambahTransaksi()">Simpan</button>
+  <div id="dashboard" class="page">
+    <div class="row">
+      <div class="card">Saldo<div class="stat" id="saldo">0</div></div>
+      <div class="card" style="color:var(--success)">Masuk<div class="stat" id="masuk">0</div></div>
+      <div class="card" style="color:var(--danger)">Keluar<div class="stat" id="keluar">0</div></div>
+    </div>
+    <div class="card"><canvas id="chart" style="max-height:300px"></canvas></div>
   </div>
 
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Tgl</th>
-          <th>Jenis</th>
-          <th>Kategori</th>
-          <th>Jumlah</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="list"></tbody>
-    </table>
+  <div id="transaksi" class="page hidden">
+    <div class="card">
+      <h3 id="formTitle">Tambah Transaksi</h3>
+      <div class="row" style="grid-template-columns: 1fr 1fr;">
+        <select id="jenis"><option value="masuk">Pemasukan</option><option value="keluar">Pengeluaran</option></select>
+        <select id="kategori"><option>Cash</option><option>Bank</option></select>
+      </div>
+      <input id="jumlah" type="text" placeholder="Jumlah (Rp)" oninput="formatInput(this)">
+      <input id="ket" placeholder="Keterangan">
+      <button onclick="simpanTransaksi()">Simpan Data</button>
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Tgl</th><th>Jenis</th><th>Ket</th><th>Jumlah</th><th>Aksi</th></tr></thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
   </div>
-</div>
 
-<!-- TARGET -->
-<div id="target" class="page hidden">
-  <div class="card">
-    <input id="targetNama" placeholder="Nama Target">
-    <input id="targetJumlah" type="number" placeholder="Jumlah Target">
-    <button onclick="setTarget()">Set Target</button>
+  <div id="target" class="page hidden">
+    <div class="card">
+      <input id="targetNama" placeholder="Nama Target">
+      <input id="targetJumlah" type="number" placeholder="Nominal Target">
+      <button onclick="setTarget()">Pasang Target</button>
+    </div>
+    <div class="card">
+      <h3 id="targetInfo">Belum ada target</h3>
+      <progress id="progress" value="0" max="100"></progress>
+      <p id="analisisText"></p>
+    </div>
   </div>
-  <div class="card">
-    <h4 id="targetInfo"></h4>
-    <progress id="progress" value="0" max="100"></progress>
-  </div>
-</div>
-
-<!-- ANALISIS -->
-<div id="analisis" class="page hidden">
-  <div class="card">
-    <canvas id="chart"></canvas>
-    <p id="analisisText"></p>
-  </div>
-</div>
-
 </div>
 
 <script>
-let data = {
-  user:{username:'admin',password:'admin123'},
-  transaksi:[],
-  target:null
-};
+const SB_URL = "https://unacewhpzcbssqchwzhk.supabase.co";
+const SB_KEY = "sb_publishable_FTitSJD_2uQpx1KSb459_A_43C12gTw";
 
+let data = { transaksi: [], target: null };
 let editIndex = null;
-let chart;
+let myChart = null;
 
-/* ===== FORMAT ANGKA ===== */
-function formatRupiah(angka){
-  return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+async function loadData() {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/app_data?id=eq.1`, {
+      headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
+    });
+    const result = await res.json();
+    if (result.length > 0) {
+      data = result[0].content;
+      render();
+    }
+  } catch (e) { console.error(e); }
 }
 
-function formatInput(el){
-  let val = el.value.replace(/\./g,'');
-  if(isNaN(val)) return;
-  el.value = formatRupiah(val);
+async function autoSave() {
+  render();
+  try {
+    await fetch(`${SB_URL}/rest/v1/app_data?id=eq.1`, {
+      method: 'PATCH',
+      headers: { 
+        "apikey": SB_KEY, 
+        "Authorization": `Bearer ${SB_KEY}`,
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ content: data })
+    });
+  } catch (e) { console.error(e); }
 }
 
-/* ===== LOGIN ===== */
-function login(){
-  if(user.value===data.user.username && pass.value===data.user.password){
+function formatRupiah(n) {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function formatInput(el) {
+  let v = el.value.replace(/\./g,'');
+  if(!isNaN(v)) el.value = formatRupiah(v);
+}
+
+function login() {
+  if(user.value==='admin' && pass.value==='admin123') {
     loginPage.classList.add('hidden');
     app.classList.remove('hidden');
-    render();
-  }
+    loadData();
+  } else { alert('Login Gagal'); }
 }
 
-function show(id,btn){
+function show(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-/* ===== TRANSAKSI ===== */
-function tambahTransaksi(){
-  let jumlahAngka = parseInt(jumlah.value.replace(/\./g,''));
-  if(isNaN(jumlahAngka)) return alert('Jumlah tidak valid');
-
-  const trx = {
-    tgl:new Date().toLocaleDateString(),
-    jenis:jenis.value,
-    kategori:kategori.value,
-    jumlah:jumlahAngka,
-    ket:ket.value
+function simpanTransaksi() {
+  const jml = parseInt(jumlah.value.replace(/\./g,''));
+  if(!jml) return;
+  const item = {
+    tgl: new Date().toLocaleDateString('id-ID'),
+    jenis: jenis.value, kategori: kategori.value,
+    jumlah: jml, ket: ket.value || '-'
   };
-
-  if(editIndex !== null){
-    data.transaksi[editIndex] = trx;
-    editIndex = null;
-  }else{
-    data.transaksi.push(trx);
+  if(editIndex !== null) {
+    data.transaksi[editIndex] = item; editIndex = null;
+  } else {
+    data.transaksi.push(item);
   }
-
-  jumlah.value=''; ket.value='';
-  render();
+  jumlah.value = ''; ket.value = '';
+  autoSave();
 }
 
-function editTrx(i){
+function editTrx(i) {
   const t = data.transaksi[i];
-  jenis.value=t.jenis;
-  kategori.value=t.kategori;
-  jumlah.value=formatRupiah(t.jumlah);
-  ket.value=t.ket||'';
-  editIndex=i;
+  jenis.value = t.jenis;
+  kategori.value = t.kategori;
+  jumlah.value = formatRupiah(t.jumlah);
+  ket.value = t.ket;
+  editIndex = i;
+  show('transaksi', document.querySelector('nav button:nth-child(2)'));
 }
 
-function hapusTrx(i){
-  if(confirm('Hapus transaksi ini?')){
+function hapusTrx(i) {
+  if(confirm('Hapus?')) {
     data.transaksi.splice(i,1);
-    render();
+    autoSave();
   }
 }
 
-/* ===== TARGET ===== */
-function setTarget(){
-  data.target={
-    nama:targetNama.value,
-    jumlah:+targetJumlah.value
-  };
-  render();
+function setTarget() {
+  data.target = { nama: targetNama.value, jml: parseInt(targetJumlah.value) };
+  autoSave();
 }
 
-/* ===== RENDER ===== */
-function render(){
-  let masuk=0, keluar=0;
-  list.innerHTML='';
-
-  data.transaksi.forEach((t,i)=>{
-    t.jenis==='masuk'?masuk+=t.jumlah:keluar+=t.jumlah;
-    list.innerHTML+=`
-      <tr>
-        <td>${t.tgl}</td>
-        <td>${t.jenis==='masuk'?'💰 Masuk':'💸 Keluar'}</td>
-        <td>${t.kategori}</td>
-        <td>${formatRupiah(t.jumlah)}</td>
-        <td>
-          <div class="aksi">
-            <button class="btn-edit" onclick="editTrx(${i})">Edit</button>
-            <button class="btn-hapus" onclick="hapusTrx(${i})">Hapus</button>
-          </div>
-        </td>
-      </tr>`;
+function render() {
+  let m = 0, k = 0;
+  list.innerHTML = '';
+  data.transaksi.forEach((t, i) => {
+    t.jenis === 'masuk' ? m += t.jumlah : k += t.jumlah;
+    list.innerHTML += `<tr>
+      <td>${t.tgl}</td>
+      <td>${t.jenis=='masuk'?'<span style="color:var(--success)">+</span>':'<span style="color:var(--danger)">-</span>'}</td>
+      <td>${t.ket}</td>
+      <td>${formatRupiah(t.jumlah)}</td>
+      <td><div class="aksi">
+        <button class="btn-edit" onclick="editTrx(${i})">Edit</button>
+        <button class="btn-hapus" onclick="hapusTrx(${i})">Hapus</button>
+      </div></td>
+    </tr>`;
   });
 
-  saldo.innerText=formatRupiah(masuk-keluar);
-  masuk.innerText=formatRupiah(masuk);
-  keluar.innerText=formatRupiah(keluar);
+  document.getElementById('saldo').innerText = formatRupiah(m - k);
+  document.getElementById('masuk').innerText = formatRupiah(m);
+  document.getElementById('keluar').innerText = formatRupiah(k);
 
-  if(data.target){
-    targetInfo.innerText=data.target.nama;
-    progress.value=Math.min(100,(masuk-keluar)/data.target.jumlah*100);
+  if(data.target) {
+    targetInfo.innerText = `${data.target.nama} (Rp ${formatRupiah(data.target.jml)})`;
+    const persen = ((m - k) / data.target.jml * 100).toFixed(1);
+    progress.value = Math.max(0, Math.min(100, persen));
+    analisisText.innerText = `Progres: ${persen}%`;
   }
 
-  if(chart) chart.destroy();
-  chart=new Chart(document.getElementById('chart'),{
-    type:'pie',
-    data:{labels:['Masuk','Keluar'],datasets:[{data:[masuk,keluar]}]}
+  if(myChart) myChart.destroy();
+  myChart = new Chart(document.getElementById('chart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Masuk', 'Keluar'],
+      datasets: [{ data: [m, k], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }]
+    },
+    options: { plugins: { legend: { labels: { color: '#fff' } } } }
   });
-
-  analisisText.innerText=
-    `Rasio tabungan ${(masuk?((masuk-keluar)/masuk*100).toFixed(1):0)}%`;
 }
 </script>
-
 </body>
 </html>
